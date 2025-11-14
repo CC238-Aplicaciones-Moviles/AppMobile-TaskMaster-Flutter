@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:taskmaster_flutter/bloc/projects/ProjectsBloc.dart';
+import 'package:taskmaster_flutter/bloc/Projects/ProjectsBloc.dart';
 import 'package:taskmaster_flutter/bloc/users/UsersBloc.dart';
 import 'package:taskmaster_flutter/bloc/Calendar/CalendarBloc.dart';
 import 'package:taskmaster_flutter/sharedPreferences/TaskmasterPrefs.dart';
