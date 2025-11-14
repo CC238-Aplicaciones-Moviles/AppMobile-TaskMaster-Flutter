@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taskmaster_flutter/models/auth/LoginRequest.dart';
 import 'package:taskmaster_flutter/sharedPreferences/TaskmasterPrefs.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 
 import '../core/auth/AuthApi.dart';
 import '../core/auth/TokenStore.dart';
@@ -59,22 +60,37 @@ class _LoginState extends State<Login> {
         throw Exception('Token vacío');
       }
 
+      // Extraer userId del token JWT
+      int? userId;
+      try {
+        Map<String, dynamic> payload = Jwt.parseJwt(token);
+        userId = payload['userId'] as int?;
+      } catch (e) {
+        print('Error al decodificar token: $e');
+      }
+
       if (_rememberMe) {
-        await _prefs.saveAll(email: email, password: password, token: token);
+        await _prefs.saveAll(
+          email: email,
+          password: password,
+          token: token,
+          userId: userId,
+        );
       } else {
         await _prefs.saveEmailAndPassword(email: email, password: password);
         await _prefs.clearToken();
+      }
+
+      // Guardar userId siempre
+      if (userId != null) {
+        await _prefs.saveUserId(userId);
       }
 
       await TokenStore.saveToken(token);
 
       if (!mounted) return;
 
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/home',
-            (route) => false,
-      );
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -154,8 +170,9 @@ class _LoginState extends State<Login> {
                       ),
                       child: Center(
                         child: ConstrainedBox(
-                          constraints:
-                          BoxConstraints(maxWidth: contentMaxWidth),
+                          constraints: BoxConstraints(
+                            maxWidth: contentMaxWidth,
+                          ),
                           child: _buildForm(
                             vSpace: vSpace,
                             topPadding: vSpace,
@@ -184,8 +201,9 @@ class _LoginState extends State<Login> {
                       ),
                       child: Center(
                         child: ConstrainedBox(
-                          constraints:
-                          BoxConstraints(maxWidth: contentMaxWidth),
+                          constraints: BoxConstraints(
+                            maxWidth: contentMaxWidth,
+                          ),
                           child: _buildForm(
                             vSpace: vSpace,
                             topPadding: 2,
@@ -242,9 +260,9 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 12),
             Text(
               'TaskMaster',
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                color: colorScheme.onSurface,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineLarge?.copyWith(color: colorScheme.onSurface),
             ),
           ],
         ),
@@ -302,7 +320,6 @@ class _LoginState extends State<Login> {
     );
   }
 
-
   Widget _buildForm({
     required double vSpace,
     required double topPadding,
@@ -314,9 +331,9 @@ class _LoginState extends State<Login> {
         SizedBox(height: topPadding),
         Text(
           'Inicia Sesión',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: colorScheme.onBackground,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(color: colorScheme.onBackground),
         ),
         SizedBox(height: vSpace),
 
@@ -360,10 +377,7 @@ class _LoginState extends State<Login> {
         SizedBox(height: vSpace),
 
         if (_error != null) ...[
-          Text(
-            _error!,
-            style: TextStyle(color: colorScheme.error),
-          ),
+          Text(_error!, style: TextStyle(color: colorScheme.error)),
           SizedBox(height: vSpace),
         ],
 
@@ -381,22 +395,22 @@ class _LoginState extends State<Login> {
             ),
             child: _isLoading
                 ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      colorScheme.onPrimary,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                const Text('Ingresando...'),
-              ],
-            )
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text('Ingresando...'),
+                    ],
+                  )
                 : const Text('Iniciar Sesión'),
           ),
         ),

@@ -6,10 +6,12 @@ class TaskmasterPrefs {
   String email = "";
   String password = "";
   String token = "";
+  int? userId;
 
   static const _keyEmail = "email";
   static const _keyPassword = "password";
   static const _keyToken = "token";
+  static const _keyUserId = "userId";
 
   Future<TaskmasterPrefs> init() async {
     _prefs ??= await SharedPreferences.getInstance();
@@ -17,25 +19,42 @@ class TaskmasterPrefs {
     email = _prefs?.getString(_keyEmail) ?? "";
     password = _prefs?.getString(_keyPassword) ?? "";
     token = _prefs?.getString(_keyToken) ?? "";
+    userId = _prefs?.getInt(_keyUserId);
 
     return this;
   }
 
+  static Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyUserId);
+  }
 
   Future<void> saveAll({
     required String email,
     required String password,
     required String token,
+    int? userId,
   }) async {
     _prefs ??= await SharedPreferences.getInstance();
 
     this.email = email;
     this.password = password;
     this.token = token;
+    this.userId = userId;
 
     await _prefs?.setString(_keyEmail, email);
     await _prefs?.setString(_keyPassword, password);
     await _prefs?.setString(_keyToken, token);
+    if (userId != null) {
+      await _prefs?.setInt(_keyUserId, userId);
+    }
+  }
+
+  Future<void> saveUserId(int userId) async {
+    _prefs ??= await SharedPreferences.getInstance();
+
+    this.userId = userId;
+    await _prefs?.setInt(_keyUserId, userId);
   }
 
   Future<void> saveEmailAndPassword({
@@ -58,7 +77,6 @@ class TaskmasterPrefs {
     await _prefs?.setString(_keyToken, token);
   }
 
-
   Future<void> clearToken() async {
     _prefs ??= await SharedPreferences.getInstance();
 
@@ -72,8 +90,10 @@ class TaskmasterPrefs {
     email = "";
     password = "";
     token = "";
+    userId = null;
     await _prefs?.remove(_keyEmail);
     await _prefs?.remove(_keyPassword);
     await _prefs?.remove(_keyToken);
+    await _prefs?.remove(_keyUserId);
   }
 }
