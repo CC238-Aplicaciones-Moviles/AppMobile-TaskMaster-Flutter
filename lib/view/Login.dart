@@ -57,57 +57,30 @@ class _LoginState extends State<Login> {
       final req = LoginRequest(email: email, password: password);
       final res = await _authApi.signIn(req);
       final token = res.token;
+      final userId = res.id;
 
       if (token.isEmpty) {
         throw Exception('Token vacío');
       }
 
-      // Guardar el token primero para poder hacer llamadas autenticadas
-      await TokenStore.saveToken(token);
-
-      // Obtener userId del backend usando el email
-      int? userId;
-      try {
-        final user = await _usersApi.getUserByEmail(email);
-        userId = user.id;
-        print('✅ Usuario obtenido: ID=$userId, email=${user.email}');
-      } catch (e) {
-        print('⚠️ Error al obtener usuario: $e');
-        // Intentar extraer del token como fallback
-        try {
-          Map<String, dynamic> payload = Jwt.parseJwt(token);
-          userId =
-              payload['userId'] as int? ??
-              payload['id'] as int? ??
-              payload['sub'] as int?;
-        } catch (e2) {
-          print('⚠️ Error al decodificar token: $e2');
-        }
-      }
+      await _prefs.saveUserId(userId);
 
       if (_rememberMe) {
-        await _prefs.saveAll(
-          email: email,
-          password: password,
-          token: token,
-          userId: userId,
-        );
+        await _prefs.saveAll(email: email, password: password, token: token, userId: userId);
       } else {
         await _prefs.saveEmailAndPassword(email: email, password: password);
         await _prefs.clearToken();
       }
 
-      // Guardar userId siempre (crítico para el calendario)
-      if (userId != null) {
-        await _prefs.saveUserId(userId);
-        print('✅ UserId guardado: $userId');
-      } else {
-        print('❌ No se pudo obtener userId');
-      }
+      await TokenStore.saveToken(token);
 
       if (!mounted) return;
 
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/home',
+            (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -187,9 +160,8 @@ class _LoginState extends State<Login> {
                       ),
                       child: Center(
                         child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: contentMaxWidth,
-                          ),
+                          constraints:
+                          BoxConstraints(maxWidth: contentMaxWidth),
                           child: _buildForm(
                             vSpace: vSpace,
                             topPadding: vSpace,
@@ -218,9 +190,8 @@ class _LoginState extends State<Login> {
                       ),
                       child: Center(
                         child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: contentMaxWidth,
-                          ),
+                          constraints:
+                          BoxConstraints(maxWidth: contentMaxWidth),
                           child: _buildForm(
                             vSpace: vSpace,
                             topPadding: 2,
@@ -277,9 +248,9 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 12),
             Text(
               'TaskMaster',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineLarge?.copyWith(color: colorScheme.onSurface),
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                color: colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -337,6 +308,7 @@ class _LoginState extends State<Login> {
     );
   }
 
+
   Widget _buildForm({
     required double vSpace,
     required double topPadding,
@@ -348,9 +320,9 @@ class _LoginState extends State<Login> {
         SizedBox(height: topPadding),
         Text(
           'Inicia Sesión',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(color: colorScheme.onBackground),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            color: colorScheme.onBackground,
+          ),
         ),
         SizedBox(height: vSpace),
 
@@ -394,7 +366,10 @@ class _LoginState extends State<Login> {
         SizedBox(height: vSpace),
 
         if (_error != null) ...[
-          Text(_error!, style: TextStyle(color: colorScheme.error)),
+          Text(
+            _error!,
+            style: TextStyle(color: colorScheme.error),
+          ),
           SizedBox(height: vSpace),
         ],
 
@@ -412,22 +387,22 @@ class _LoginState extends State<Login> {
             ),
             child: _isLoading
                 ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            colorScheme.onPrimary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Text('Ingresando...'),
-                    ],
-                  )
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Text('Ingresando...'),
+              ],
+            )
                 : const Text('Iniciar Sesión'),
           ),
         ),

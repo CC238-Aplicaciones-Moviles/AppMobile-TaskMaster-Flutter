@@ -8,6 +8,8 @@ import 'package:taskmaster_flutter/view/navigation/MainBottomNavScreen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'AppTheme.dart';
+import 'bloc/Projects/ProjectsBloc.dart';
+import 'bloc/Tasks/TasksBloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,16 +32,25 @@ class MyApp extends StatelessWidget {
     final effectivePrefs = prefs ?? TaskmasterPrefs();
 
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => CalendarBloc())],
+      providers: [
+        BlocProvider<ProjectsBloc>(
+          create: (context) => ProjectsBloc(),
+        ),
+        BlocProvider<TasksBloc>(
+          create: (context) => TasksBloc(),
+        ),
+        BlocProvider(
+            create: (context) => CalendarBloc())
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'TaskMaster',
         theme: AppTheme.light,
         initialRoute: '/login',
         routes: {
-          '/login': (_) => Login(prefs: effectivePrefs),
+          '/login':    (_) => Login(prefs: effectivePrefs),
           '/register': (_) => Register(prefs: effectivePrefs),
-          '/home': (_) => MainBottomNavScreen(prefs: effectivePrefs),
+          '/home':     (_) => MainBottomNavScreen(prefs: effectivePrefs),
         },
       ),
     );

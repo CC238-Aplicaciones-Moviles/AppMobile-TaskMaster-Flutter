@@ -45,7 +45,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
       ) async {
     emit(ProjectsLoadInProgress());
     try {
-      final projects = await _repository.getByMember(event.memberId);
+      final projects = await _repository.getByMember();
       emit(ProjectsLoadSuccess(projects: projects));
     } catch (e) {
       emit(ProjectsFailure(message: e.toString()));

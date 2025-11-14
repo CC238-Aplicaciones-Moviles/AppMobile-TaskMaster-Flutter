@@ -6,7 +6,7 @@ class TaskmasterPrefs {
   String email = "";
   String password = "";
   String token = "";
-  int? userId;
+  int userId = 0;
 
   static const _keyEmail = "email";
   static const _keyPassword = "password";
@@ -19,21 +19,17 @@ class TaskmasterPrefs {
     email = _prefs?.getString(_keyEmail) ?? "";
     password = _prefs?.getString(_keyPassword) ?? "";
     token = _prefs?.getString(_keyToken) ?? "";
-    userId = _prefs?.getInt(_keyUserId);
+    userId = _prefs?.getInt(_keyUserId) ?? 0;
 
     return this;
   }
 
-  static Future<int?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_keyUserId);
-  }
 
   Future<void> saveAll({
     required String email,
     required String password,
     required String token,
-    int? userId,
+    required int userId,
   }) async {
     _prefs ??= await SharedPreferences.getInstance();
 
@@ -45,15 +41,6 @@ class TaskmasterPrefs {
     await _prefs?.setString(_keyEmail, email);
     await _prefs?.setString(_keyPassword, password);
     await _prefs?.setString(_keyToken, token);
-    if (userId != null) {
-      await _prefs?.setInt(_keyUserId, userId);
-    }
-  }
-
-  Future<void> saveUserId(int userId) async {
-    _prefs ??= await SharedPreferences.getInstance();
-
-    this.userId = userId;
     await _prefs?.setInt(_keyUserId, userId);
   }
 
@@ -77,6 +64,25 @@ class TaskmasterPrefs {
     await _prefs?.setString(_keyToken, token);
   }
 
+  Future<void> saveUserId(int userId) async {
+    _prefs ??= await SharedPreferences.getInstance();
+
+    this.userId = userId;
+    await _prefs?.setInt(_keyUserId, userId);
+  }
+
+  Future<int?> getUserId() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs?.getInt(_keyUserId);
+  }
+
+  Future<void> clearUserId() async {
+    _prefs ??= await SharedPreferences.getInstance();
+
+    userId = 0;
+    await _prefs?.remove(_keyUserId);
+  }
+
   Future<void> clearToken() async {
     _prefs ??= await SharedPreferences.getInstance();
 
@@ -90,7 +96,7 @@ class TaskmasterPrefs {
     email = "";
     password = "";
     token = "";
-    userId = null;
+    userId = 0;
     await _prefs?.remove(_keyEmail);
     await _prefs?.remove(_keyPassword);
     await _prefs?.remove(_keyToken);

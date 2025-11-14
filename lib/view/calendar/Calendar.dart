@@ -32,7 +32,7 @@ class _CalendarState extends State<Calendar>
   Future<void> _loadCalendar() async {
     try {
       print('📅 Calendario: Obteniendo userId de SharedPreferences...');
-      final userId = await TaskmasterPrefs.getUserId();
+      final userId = await TaskmasterPrefs().getUserId();
       print(
         '📅 Calendario: userId obtenido = $userId (tipo: ${userId.runtimeType})',
       );

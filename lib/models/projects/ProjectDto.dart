@@ -2,7 +2,6 @@
 
 class ProjectDto {
   final int id;
-  final int projectId;
   final String key;
   final int leaderId;
   final String name;
@@ -15,7 +14,6 @@ class ProjectDto {
 
   ProjectDto({
     required this.id,
-    required this.projectId,
     required this.key,
     required this.leaderId,
     required this.name,
@@ -29,8 +27,7 @@ class ProjectDto {
 
   factory ProjectDto.fromJson(Map<String, dynamic> json) {
     return ProjectDto(
-      id: (json['id'] as num).toInt(),
-      projectId: (json['projectId'] as num).toInt(),
+      id: (json['projectId'] as num).toInt(),
       key: json['key'] as String,
       leaderId: (json['leaderId'] as num).toInt(),
       name: json['name'] as String,
