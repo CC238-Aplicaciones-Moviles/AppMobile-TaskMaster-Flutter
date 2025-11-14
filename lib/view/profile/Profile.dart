@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskmaster_flutter/sharedPreferences/TaskmasterPrefs.dart';
-import '../../bloc/users/UsersBloc.dart';
-import '../../bloc/projects/ProjectsBloc.dart';
+import 'package:taskmaster_flutter/bloc/users/UsersBloc.dart';
+import 'package:taskmaster_flutter/bloc/Projects/ProjectsBloc.dart';
 import '../../models/user/UserDto.dart';
 import '../../models/user/UserUpdateRequest.dart';
 
