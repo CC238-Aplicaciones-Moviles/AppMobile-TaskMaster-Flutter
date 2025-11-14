@@ -33,10 +33,14 @@ class _CalendarState extends State<Calendar>
     try {
       print('📅 Calendario: Obteniendo userId de SharedPreferences...');
       final userId = await TaskmasterPrefs.getUserId();
-      print('📅 Calendario: userId obtenido = $userId (tipo: ${userId.runtimeType})');
-      
+      print(
+        '📅 Calendario: userId obtenido = $userId (tipo: ${userId.runtimeType})',
+      );
+
       if (userId != null && userId > 0 && mounted) {
-        print('✅ Calendario: UserId válido ($userId), despachando evento CalendarLoadRequested');
+        print(
+          '✅ Calendario: UserId válido ($userId), despachando evento CalendarLoadRequested',
+        );
         context.read<CalendarBloc>().add(CalendarLoadRequested(userId));
       } else if (mounted) {
         print('❌ Calendario: UserId inválido (null o <= 0)');
@@ -270,8 +274,12 @@ class _CalendarState extends State<Calendar>
                 painter: CalendarGridPainter(
                   calendarDays: state.calendarDays,
                   selectedDate: state.selectedDate,
-                  primaryColor: Theme.of(context).colorScheme.primary, // RedWine600
-                  textColor: Theme.of(context).colorScheme.onBackground, // Brownish900
+                  primaryColor: Theme.of(
+                    context,
+                  ).colorScheme.primary, // RedWine600
+                  textColor: Theme.of(
+                    context,
+                  ).colorScheme.onBackground, // Brownish900
                   tapPosition: _tapPosition,
                   animation: _animationController,
                 ),
@@ -471,10 +479,9 @@ class _CalendarState extends State<Calendar>
                     Text(
                       task.description,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.7),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -495,11 +502,11 @@ class _CalendarState extends State<Calendar>
                         ),
                         child: Text(
                           statusText,
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color:
-                            Theme.of(context).colorScheme.onSurface,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w500,
+                              ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -518,13 +525,11 @@ class _CalendarState extends State<Calendar>
                               : task.priority == TaskPriority.MEDIUM
                               ? 'Media'
                               : 'Baja',
-                          style:
-                          Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w500,
+                              ),
                         ),
                       ),
                     ],
@@ -539,11 +544,11 @@ class _CalendarState extends State<Calendar>
   }
 }
 
-  class CalendarGridPainter extends CustomPainter {
+class CalendarGridPainter extends CustomPainter {
   final List<CalendarDay> calendarDays;
   final DateTime? selectedDate;
-  final Color primaryColor;   // equivalente a RedWine600
-  final Color textColor;      // equivalente a Brownish900
+  final Color primaryColor; // equivalente a RedWine600
+  final Color textColor; // equivalente a Brownish900
   final Offset? tapPosition;
   final Animation<double> animation;
 
@@ -581,18 +586,12 @@ class _CalendarState extends State<Calendar>
       final radius = maxSide * 1.0 * animation.value;
 
       final gradient = RadialGradient(
-        colors: [
-          primaryColor.withOpacity(0.8),
-          primaryColor.withOpacity(0.2),
-        ],
+        colors: [primaryColor.withOpacity(0.8), primaryColor.withOpacity(0.2)],
       );
 
       final paint = Paint()
         ..shader = gradient.createShader(
-          Rect.fromCircle(
-            center: tapPosition!,
-            radius: radius,
-          ),
+          Rect.fromCircle(center: tapPosition!, radius: radius),
         )
         ..style = PaintingStyle.fill;
 
@@ -631,21 +630,13 @@ class _CalendarState extends State<Calendar>
     // Horizontales
     for (int i = 1; i < rows; i++) {
       final dy = i * cellHeight;
-      canvas.drawLine(
-        Offset(0, dy),
-        Offset(size.width, dy),
-        gridPaint,
-      );
+      canvas.drawLine(Offset(0, dy), Offset(size.width, dy), gridPaint);
     }
 
     // Verticales
     for (int i = 1; i < columns; i++) {
       final dx = i * cellWidth;
-      canvas.drawLine(
-        Offset(dx, 0),
-        Offset(dx, size.height),
-        gridPaint,
-      );
+      canvas.drawLine(Offset(dx, 0), Offset(dx, size.height), gridPaint);
     }
 
     // =========================
@@ -665,9 +656,9 @@ class _CalendarState extends State<Calendar>
 
       final isSelected =
           selectedDate != null &&
-              day.date.year == selectedDate!.year &&
-              day.date.month == selectedDate!.month &&
-              day.date.day == selectedDate!.day;
+          day.date.year == selectedDate!.year &&
+          day.date.month == selectedDate!.month &&
+          day.date.day == selectedDate!.day;
 
       // ===== Fondo día seleccionado (rect redondeado dentro de la celda) =====
       if (isSelected) {
@@ -688,8 +679,8 @@ class _CalendarState extends State<Calendar>
       if (day.tasks.isNotEmpty) {
         final highestPriority = day.tasks.fold<TaskPriority>(
           TaskPriority.LOW,
-              (prev, task) =>
-          task.priority.index > prev.index ? task.priority : prev,
+          (prev, task) =>
+              task.priority.index > prev.index ? task.priority : prev,
         );
 
         Color indicatorColor;
@@ -750,10 +741,7 @@ class _CalendarState extends State<Calendar>
 
       textPainter.layout();
 
-      final textOffset = Offset(
-        cellRect.left + 15,
-        cellRect.top + 15,
-      );
+      final textOffset = Offset(cellRect.left + 15, cellRect.top + 15);
 
       textPainter.paint(canvas, textOffset);
     }
@@ -766,6 +754,3 @@ class _CalendarState extends State<Calendar>
         oldDelegate.tapPosition != tapPosition;
   }
 }
-
-
-

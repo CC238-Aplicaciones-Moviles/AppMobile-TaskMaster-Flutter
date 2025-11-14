@@ -76,7 +76,10 @@ class _LoginState extends State<Login> {
         // Intentar extraer del token como fallback
         try {
           Map<String, dynamic> payload = Jwt.parseJwt(token);
-          userId = payload['userId'] as int? ?? payload['id'] as int? ?? payload['sub'] as int?;
+          userId =
+              payload['userId'] as int? ??
+              payload['id'] as int? ??
+              payload['sub'] as int?;
         } catch (e2) {
           print('⚠️ Error al decodificar token: $e2');
         }

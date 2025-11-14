@@ -28,31 +28,46 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
     emit(const CalendarLoadInProgress());
     try {
       _currentUserId = event.userId;
-      
+
       // Validar userId
       if (event.userId <= 0) {
         print('❌ CalendarBloc: UserId inválido (${event.userId})');
-        emit(const CalendarFailure(
-          message: 'No se pudo obtener el ID del usuario. Por favor, inicia sesión nuevamente.',
-        ));
+        emit(
+          const CalendarFailure(
+            message:
+                'No se pudo obtener el ID del usuario. Por favor, inicia sesión nuevamente.',
+          ),
+        );
         return;
       }
-      
-      print('📅 CalendarBloc: Llamando API getByUser para userId=$_currentUserId');
+
+      print(
+        '📅 CalendarBloc: Llamando API getByUser para userId=$_currentUserId',
+      );
       _allTasks = await _repository.getByUser(event.userId);
-      print('✅ CalendarBloc: ${_allTasks.length} tareas obtenidas exitosamente');
-      
+      print(
+        '✅ CalendarBloc: ${_allTasks.length} tareas obtenidas exitosamente',
+      );
+
       if (_allTasks.isNotEmpty) {
-        print('📋 Primera tarea: "${_allTasks[0].title}" (${_allTasks[0].startDate} - ${_allTasks[0].endDate})');
+        print(
+          '📋 Primera tarea: "${_allTasks[0].title}" (${_allTasks[0].startDate} - ${_allTasks[0].endDate})',
+        );
       }
 
       final now = DateTime.now();
       final currentMonth = DateTime(now.year, now.month);
-      print('📅 CalendarBloc: Generando calendario para mes: ${currentMonth.year}-${currentMonth.month}');
+      print(
+        '📅 CalendarBloc: Generando calendario para mes: ${currentMonth.year}-${currentMonth.month}',
+      );
       final calendarDays = _generateCalendarDays(currentMonth, _allTasks);
-      
-      print('✅ CalendarBloc: Calendario generado con ${calendarDays.length} días');
-      final daysWithTasks = calendarDays.where((d) => d.tasks.isNotEmpty).length;
+
+      print(
+        '✅ CalendarBloc: Calendario generado con ${calendarDays.length} días',
+      );
+      final daysWithTasks = calendarDays
+          .where((d) => d.tasks.isNotEmpty)
+          .length;
       print('📊 CalendarBloc: $daysWithTasks días tienen tareas asignadas');
 
       emit(
@@ -65,7 +80,11 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
     } catch (e, stackTrace) {
       print('❌ CalendarBloc Error: $e');
       print('❌ Stack trace: $stackTrace');
-      emit(CalendarFailure(message: 'Error al cargar el calendario: ${e.toString()}'));
+      emit(
+        CalendarFailure(
+          message: 'Error al cargar el calendario: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -181,21 +200,26 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
         final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
 
         // Solo coincide si es la fecha de inicio O la fecha de fin
-        final matches = dateOnly.isAtSameMomentAs(startDateOnly) ||
+        final matches =
+            dateOnly.isAtSameMomentAs(startDateOnly) ||
             dateOnly.isAtSameMomentAs(endDateOnly);
-        
+
         if (matches) {
-          print('✅ Tarea "${task.title}" coincide con fecha ${dateOnly.year}-${dateOnly.month}-${dateOnly.day}');
+          print(
+            '✅ Tarea "${task.title}" coincide con fecha ${dateOnly.year}-${dateOnly.month}-${dateOnly.day}',
+          );
         }
-        
+
         return matches;
       } catch (e) {
         print('⚠️ Error al parsear fechas de tarea: $e');
         return false;
       }
     }).toList();
-    
-    print('📅 Tareas para ${dateOnly.year}-${dateOnly.month}-${dateOnly.day}: ${matchingTasks.length}');
+
+    print(
+      '📅 Tareas para ${dateOnly.year}-${dateOnly.month}-${dateOnly.day}: ${matchingTasks.length}',
+    );
     return matchingTasks;
   }
 }

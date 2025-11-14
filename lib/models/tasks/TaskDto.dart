@@ -1,16 +1,17 @@
 enum TaskStatus { TO_DO, IN_PROGRESS, DONE, CANCELED }
+
 enum TaskPriority { LOW, MEDIUM, HIGH }
 
 TaskStatus taskStatusFromString(String value) {
   return TaskStatus.values.firstWhere(
-        (e) => e.name == value,
+    (e) => e.name == value,
     orElse: () => TaskStatus.TO_DO,
   );
 }
 
 TaskPriority taskPriorityFromString(String value) {
   return TaskPriority.values.firstWhere(
-        (e) => e.name == value,
+    (e) => e.name == value,
     orElse: () => TaskPriority.MEDIUM,
   );
 }
@@ -55,10 +56,12 @@ class TaskDto {
       endDate: json['endDate'] as String? ?? '',
       status: taskStatusFromString(json['status'] as String? ?? 'TO_DO'),
       priority: taskPriorityFromString(json['priority'] as String? ?? 'MEDIUM'),
-      assignedUserIds: (json['assignedUserIds'] as List?)
-          ?.map((e) => (e as num?)?.toInt() ?? 0)
-          .where((id) => id > 0)
-          .toList() ?? [],
+      assignedUserIds:
+          (json['assignedUserIds'] as List?)
+              ?.map((e) => (e as num?)?.toInt() ?? 0)
+              .where((id) => id > 0)
+              .toList() ??
+          [],
       createdAt: json['createdAt'] as String? ?? '',
       updatedAt: json['updatedAt'] as String? ?? '',
     );
