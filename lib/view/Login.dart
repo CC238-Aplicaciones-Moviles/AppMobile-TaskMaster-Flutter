@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:taskmaster_flutter/models/auth/LoginRequest.dart';
 import 'package:taskmaster_flutter/sharedPreferences/TaskmasterPrefs.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 
 import '../core/auth/AuthApi.dart';
 import '../core/auth/TokenStore.dart';
+import '../core/users/UsersApi.dart';
 
 class Login extends StatefulWidget {
   final TaskmasterPrefs prefs;
@@ -16,6 +18,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _authApi = AuthApi();
+  final _usersApi = UsersApi();
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -54,13 +57,16 @@ class _LoginState extends State<Login> {
       final req = LoginRequest(email: email, password: password);
       final res = await _authApi.signIn(req);
       final token = res.token;
+      final userId = res.id;
 
       if (token.isEmpty) {
         throw Exception('Token vacío');
       }
 
+      await _prefs.saveUserId(userId);
+
       if (_rememberMe) {
-        await _prefs.saveAll(email: email, password: password, token: token);
+        await _prefs.saveAll(email: email, password: password, token: token, userId: userId);
       } else {
         await _prefs.saveEmailAndPassword(email: email, password: password);
         await _prefs.clearToken();

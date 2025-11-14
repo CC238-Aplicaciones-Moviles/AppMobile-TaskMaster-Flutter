@@ -17,7 +17,6 @@ TaskPriority taskPriorityFromString(String value) {
 
 class TaskDto {
   final int id;
-  final int taskId;
   final int projectId;
   final String title;
   final String description;
@@ -31,7 +30,6 @@ class TaskDto {
 
   TaskDto({
     required this.id,
-    required this.taskId,
     required this.projectId,
     required this.title,
     required this.description,
@@ -46,8 +44,7 @@ class TaskDto {
 
   factory TaskDto.fromJson(Map<String, dynamic> json) {
     return TaskDto(
-      id: (json['id'] as num).toInt(),
-      taskId: (json['taskId'] as num).toInt(),
+      id: (json['taskId'] as num).toInt(),
       projectId: (json['projectId'] as num).toInt(),
       title: json['title'] as String,
       description: json['description'] as String,

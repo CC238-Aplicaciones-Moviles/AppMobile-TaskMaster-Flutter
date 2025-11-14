@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import '../../models/tasks/TaskDto.dart';
@@ -21,10 +20,7 @@ class TasksApi {
 
   /// POST /api/v1/tasks
   Future<TaskDto> createTask(TaskCreateRequest body) async {
-    final res = await _client.post(
-      'api/v1/tasks',
-      body: body.toJson(),
-    );
+    final res = await _client.post('api/v1/tasks', body: body.toJson());
     final json = jsonDecode(res.body) as Map<String, dynamic>;
     return TaskDto.fromJson(json);
   }
@@ -38,10 +34,7 @@ class TasksApi {
 
   /// PUT /api/v1/tasks/{taskId}
   Future<TaskDto> updateTask(int taskId, TaskUpdateRequest body) async {
-    final res = await _client.put(
-      'api/v1/tasks/$taskId',
-      body: body.toJson(),
-    );
+    final res = await _client.put('api/v1/tasks/$taskId', body: body.toJson());
     final json = jsonDecode(res.body) as Map<String, dynamic>;
     return TaskDto.fromJson(json);
   }
@@ -83,11 +76,26 @@ class TasksApi {
 
   /// GET /api/v1/tasks/user/{userId}
   Future<List<TaskDto>> getTasksByUser(int userId) async {
-    final res = await _client.get('api/v1/tasks/user/$userId');
-    final list = jsonDecode(res.body) as List;
-    return list
-        .map((e) => TaskDto.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      print('🌐 TasksApi: GET /api/v1/tasks/user/$userId');
+      final res = await _client.get('api/v1/tasks/user/$userId');
+      print('✅ TasksApi: Response status ${res.statusCode}');
+      print('📋 TasksApi: Response body: ${res.body}');
+
+      final list = jsonDecode(res.body) as List;
+      print('📊 TasksApi: Parseando ${list.length} tareas del JSON');
+
+      final tasks = list
+          .map((e) => TaskDto.fromJson(e as Map<String, dynamic>))
+          .toList();
+
+      print('✅ TasksApi: ${tasks.length} tareas convertidas exitosamente');
+      return tasks;
+    } catch (e, stackTrace) {
+      print('❌ TasksApi Error en getTasksByUser($userId): $e');
+      print('❌ Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   /// GET /api/v1/tasks/project/{projectId}
@@ -101,9 +109,9 @@ class TasksApi {
 
   /// GET /api/v1/tasks/project/{projectId}/user/{userId}
   Future<List<TaskDto>> getTasksByProjectAndUser(
-      int projectId,
-      int userId,
-      ) async {
+    int projectId,
+    int userId,
+  ) async {
     final res = await _client.get(
       'api/v1/tasks/project/$projectId/user/$userId',
     );
@@ -115,9 +123,9 @@ class TasksApi {
 
   /// GET /api/v1/tasks/project/{projectId}/status/{status}
   Future<List<TaskDto>> getTasksByProjectAndStatus(
-      int projectId,
-      String status,
-      ) async {
+    int projectId,
+    String status,
+  ) async {
     final res = await _client.get(
       'api/v1/tasks/project/$projectId/status/$status',
     );
@@ -129,9 +137,9 @@ class TasksApi {
 
   /// GET /api/v1/tasks/project/{projectId}/priority/{priority}
   Future<List<TaskDto>> getTasksByProjectAndPriority(
-      int projectId,
-      String priority,
-      ) async {
+    int projectId,
+    String priority,
+  ) async {
     final res = await _client.get(
       'api/v1/tasks/project/$projectId/priority/$priority',
     );

@@ -2,14 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskmaster_flutter/bloc/projects/ProjectsBloc.dart';
 import 'package:taskmaster_flutter/bloc/users/UsersBloc.dart';
+import 'package:taskmaster_flutter/bloc/Calendar/CalendarBloc.dart';
 import 'package:taskmaster_flutter/sharedPreferences/TaskmasterPrefs.dart';
 import 'package:taskmaster_flutter/view/Login.dart';
 import 'package:taskmaster_flutter/view/Register.dart';
 import 'package:taskmaster_flutter/view/navigation/MainBottomNavScreen.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
 import 'AppTheme.dart';
+import 'bloc/Projects/ProjectsBloc.dart';
+import 'bloc/Tasks/TasksBloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializar los locales de intl
+  await initializeDateFormatting('es_ES', null);
+
   final prefs = await TaskmasterPrefs().init();
   runApp(MyApp(prefs: prefs));
 }
@@ -30,6 +39,13 @@ class MyApp extends StatelessWidget {
         BlocProvider<UsersBloc>(
           create: (_) => UsersBloc(),
         ),
+          create: (context) => ProjectsBloc(),
+        ),
+        BlocProvider<TasksBloc>(
+          create: (context) => TasksBloc(),
+        ),
+        BlocProvider(
+            create: (context) => CalendarBloc())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
