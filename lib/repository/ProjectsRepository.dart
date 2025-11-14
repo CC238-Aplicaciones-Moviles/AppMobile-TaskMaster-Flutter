@@ -30,9 +30,9 @@ class ProjectsRepository {
   Future<ProjectDto> setCode(int projectId, String code) =>
       _api.setProjectCode(projectId, ProjectCodeRequest(code));
 
-  /// GET /api/v1/projects/member/{memberId}
-  Future<List<ProjectDto>> getByMember(int memberId) =>
-      _api.getProjectsByMember(memberId);
+  /// GET /api/v1/projects/member/
+  Future<List<ProjectDto>> getByMember() =>
+      _api.getProjectsByMember();
 
   /// GET /api/v1/projects/leader/{leaderId}
   Future<List<ProjectDto>> getByLeader(int leaderId) =>

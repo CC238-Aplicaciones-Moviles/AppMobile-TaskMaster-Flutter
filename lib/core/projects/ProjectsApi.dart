@@ -69,10 +69,9 @@ class ProjectsApi {
     return ProjectDto.fromJson(json);
   }
 
-  /// GET /api/v1/projects/member/{memberId}
-  Future<List<ProjectDto>> getProjectsByMember(int memberId) async {
-    final res =
-    await _client.get('api/v1/projects/member/$memberId');
+  /// GET /api/v1/projects/member - Proyectos del usuario logeado
+  Future<List<ProjectDto>> getProjectsByMember() async {
+    final res = await _client.get('api/v1/projects/member');
     final list = jsonDecode(res.body) as List;
     return list
         .map((e) => ProjectDto.fromJson(e as Map<String, dynamic>))

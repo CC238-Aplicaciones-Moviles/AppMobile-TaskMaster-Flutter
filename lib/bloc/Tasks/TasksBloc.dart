@@ -203,11 +203,26 @@ class TasksBloc extends Bloc<TasksEvent, TasksState> {
       TaskStatusUpdateRequested event,
       Emitter<TasksState> emit,
       ) async {
-    emit(TasksLoadInProgress());
+    // Guardar el estado actual
+    final currentState = state;
+
     try {
-      final updated =
-      await _repository.updateStatus(event.taskId, event.status);
-      emit(TaskStatusUpdateSuccess(task: updated));
+      // Actualizar el estado en el servidor
+      final updated = await _repository.updateStatus(event.taskId, event.status);
+
+      // Si el estado actual tiene tareas, actualizar localmente
+      if (currentState is TasksLoadSuccess) {
+        final updatedTasks = currentState.tasks.map((task) {
+          if (task.id == updated.id) {
+            return updated; // Reemplazar con la tarea actualizada
+          }
+          return task;
+        }).toList();
+
+        emit(TasksLoadSuccess(tasks: updatedTasks));
+      } else {
+        emit(TaskStatusUpdateSuccess(task: updated));
+      }
     } catch (e) {
       emit(TasksFailure(message: e.toString()));
     }

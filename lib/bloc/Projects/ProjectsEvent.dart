@@ -12,9 +12,7 @@ class ProjectsFetchAllRequested extends ProjectsEvent {
 
 /// Cargar proyectos por miembro (memberId)
 class ProjectsFetchByMemberRequested extends ProjectsEvent {
-  final int memberId;
-
-  const ProjectsFetchByMemberRequested(this.memberId);
+  const ProjectsFetchByMemberRequested();
 }
 
 /// Cargar proyectos por leaderId
