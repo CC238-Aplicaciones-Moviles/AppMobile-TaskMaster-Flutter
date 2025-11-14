@@ -10,13 +10,13 @@ import 'package:taskmaster_flutter/view/navigation/MainBottomNavScreen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'AppTheme.dart';
-import 'bloc/Projects/ProjectsBloc.dart';
+
 import 'bloc/Tasks/TasksBloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicializar los locales de intl
+
   await initializeDateFormatting('es_ES', null);
 
   final prefs = await TaskmasterPrefs().init();
@@ -39,13 +39,12 @@ class MyApp extends StatelessWidget {
         BlocProvider<UsersBloc>(
           create: (_) => UsersBloc(),
         ),
-          create: (context) => ProjectsBloc(),
-        ),
         BlocProvider<TasksBloc>(
-          create: (context) => TasksBloc(),
+          create: (_) => TasksBloc(),
         ),
-        BlocProvider(
-            create: (context) => CalendarBloc())
+        BlocProvider<CalendarBloc>(
+          create: (context) => CalendarBloc(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
