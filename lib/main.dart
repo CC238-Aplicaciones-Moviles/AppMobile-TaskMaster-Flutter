@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskmaster_flutter/bloc/projects/ProjectsBloc.dart';
+import 'package:taskmaster_flutter/bloc/users/UsersBloc.dart';
 import 'package:taskmaster_flutter/bloc/Calendar/CalendarBloc.dart';
 import 'package:taskmaster_flutter/sharedPreferences/TaskmasterPrefs.dart';
 import 'package:taskmaster_flutter/view/Login.dart';
@@ -18,13 +20,11 @@ Future<void> main() async {
   await initializeDateFormatting('es_ES', null);
 
   final prefs = await TaskmasterPrefs().init();
-
   runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {
   final TaskmasterPrefs? prefs;
-
   const MyApp({super.key, this.prefs});
 
   @override
@@ -34,6 +34,11 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ProjectsBloc>(
+          create: (_) => ProjectsBloc(),
+        ),
+        BlocProvider<UsersBloc>(
+          create: (_) => UsersBloc(),
+        ),
           create: (context) => ProjectsBloc(),
         ),
         BlocProvider<TasksBloc>(
@@ -48,9 +53,9 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.light,
         initialRoute: '/login',
         routes: {
-          '/login':    (_) => Login(prefs: effectivePrefs),
+          '/login': (_) => Login(prefs: effectivePrefs),
           '/register': (_) => Register(prefs: effectivePrefs),
-          '/home':     (_) => MainBottomNavScreen(prefs: effectivePrefs),
+          '/home': (_) => MainBottomNavScreen(prefs: effectivePrefs),
         },
       ),
     );
