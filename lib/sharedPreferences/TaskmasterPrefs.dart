@@ -1,3 +1,4 @@
+// dart
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskmasterPrefs {
@@ -21,6 +22,20 @@ class TaskmasterPrefs {
     return this;
   }
 
+
+  String getEmail() => email;
+  String getPassword() => password;
+
+
+  Future<String> getEmailAsync() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs?.getString(_keyEmail) ?? email;
+  }
+
+  Future<String> getPasswordAsync() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs?.getString(_keyPassword) ?? password;
+  }
 
   Future<void> saveAll({
     required String email,
@@ -57,7 +72,6 @@ class TaskmasterPrefs {
     this.token = token;
     await _prefs?.setString(_keyToken, token);
   }
-
 
   Future<void> clearToken() async {
     _prefs ??= await SharedPreferences.getInstance();
