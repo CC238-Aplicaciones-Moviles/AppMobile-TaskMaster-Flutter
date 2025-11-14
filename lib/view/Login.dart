@@ -5,6 +5,7 @@ import 'package:jwt_decode/jwt_decode.dart';
 
 import '../core/auth/AuthApi.dart';
 import '../core/auth/TokenStore.dart';
+import '../core/users/UsersApi.dart';
 
 class Login extends StatefulWidget {
   final TaskmasterPrefs prefs;
@@ -17,6 +18,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _authApi = AuthApi();
+  final _usersApi = UsersApi();
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -60,13 +62,24 @@ class _LoginState extends State<Login> {
         throw Exception('Token vacío');
       }
 
-      // Extraer userId del token JWT
+      // Guardar el token primero para poder hacer llamadas autenticadas
+      await TokenStore.saveToken(token);
+
+      // Obtener userId del backend usando el email
       int? userId;
       try {
-        Map<String, dynamic> payload = Jwt.parseJwt(token);
-        userId = payload['userId'] as int?;
+        final user = await _usersApi.getUserByEmail(email);
+        userId = user.id;
+        print('✅ Usuario obtenido: ID=$userId, email=${user.email}');
       } catch (e) {
-        print('Error al decodificar token: $e');
+        print('⚠️ Error al obtener usuario: $e');
+        // Intentar extraer del token como fallback
+        try {
+          Map<String, dynamic> payload = Jwt.parseJwt(token);
+          userId = payload['userId'] as int? ?? payload['id'] as int? ?? payload['sub'] as int?;
+        } catch (e2) {
+          print('⚠️ Error al decodificar token: $e2');
+        }
       }
 
       if (_rememberMe) {
@@ -81,12 +94,13 @@ class _LoginState extends State<Login> {
         await _prefs.clearToken();
       }
 
-      // Guardar userId siempre
+      // Guardar userId siempre (crítico para el calendario)
       if (userId != null) {
         await _prefs.saveUserId(userId);
+        print('✅ UserId guardado: $userId');
+      } else {
+        print('❌ No se pudo obtener userId');
       }
-
-      await TokenStore.saveToken(token);
 
       if (!mounted) return;
 

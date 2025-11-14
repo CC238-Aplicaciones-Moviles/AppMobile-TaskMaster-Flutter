@@ -30,13 +30,34 @@ class _CalendarState extends State<Calendar>
   }
 
   Future<void> _loadCalendar() async {
-    final userId = await TaskmasterPrefs.getUserId();
-    if (userId != null && mounted) {
-      context.read<CalendarBloc>().add(CalendarLoadRequested(userId));
-    } else if (mounted) {
-      // Si no hay userId, intentar cargar con un ID temporal o mostrar error
-      // Por ahora, cargaremos con ID 1 como fallback para testing
-      context.read<CalendarBloc>().add(const CalendarLoadRequested(1));
+    try {
+      print('📅 Calendario: Obteniendo userId de SharedPreferences...');
+      final userId = await TaskmasterPrefs.getUserId();
+      print('📅 Calendario: userId obtenido = $userId (tipo: ${userId.runtimeType})');
+      
+      if (userId != null && userId > 0 && mounted) {
+        print('✅ Calendario: UserId válido ($userId), despachando evento CalendarLoadRequested');
+        context.read<CalendarBloc>().add(CalendarLoadRequested(userId));
+      } else if (mounted) {
+        print('❌ Calendario: UserId inválido (null o <= 0)');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Por favor, inicia sesión nuevamente'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
+      print('❌ Error al cargar calendario: $e');
+      print('Stack trace: $stackTrace');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error inesperado: ${e.toString()}'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 

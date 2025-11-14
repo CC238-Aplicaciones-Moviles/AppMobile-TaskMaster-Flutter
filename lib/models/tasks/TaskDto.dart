@@ -46,20 +46,21 @@ class TaskDto {
 
   factory TaskDto.fromJson(Map<String, dynamic> json) {
     return TaskDto(
-      id: (json['id'] as num).toInt(),
-      taskId: (json['taskId'] as num).toInt(),
-      projectId: (json['projectId'] as num).toInt(),
-      title: json['title'] as String,
-      description: json['description'] as String,
-      startDate: json['startDate'] as String,
-      endDate: json['endDate'] as String,
-      status: taskStatusFromString(json['status'] as String),
-      priority: taskPriorityFromString(json['priority'] as String),
-      assignedUserIds: (json['assignedUserIds'] as List)
-          .map((e) => (e as num).toInt())
-          .toList(),
-      createdAt: json['createdAt'] as String,
-      updatedAt: json['updatedAt'] as String,
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      taskId: (json['taskId'] as num?)?.toInt() ?? 0,
+      projectId: (json['projectId'] as num?)?.toInt() ?? 0,
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      startDate: json['startDate'] as String? ?? '',
+      endDate: json['endDate'] as String? ?? '',
+      status: taskStatusFromString(json['status'] as String? ?? 'TO_DO'),
+      priority: taskPriorityFromString(json['priority'] as String? ?? 'MEDIUM'),
+      assignedUserIds: (json['assignedUserIds'] as List?)
+          ?.map((e) => (e as num?)?.toInt() ?? 0)
+          .where((id) => id > 0)
+          .toList() ?? [],
+      createdAt: json['createdAt'] as String? ?? '',
+      updatedAt: json['updatedAt'] as String? ?? '',
     );
   }
 }

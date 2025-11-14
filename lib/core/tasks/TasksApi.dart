@@ -83,11 +83,26 @@ class TasksApi {
 
   /// GET /api/v1/tasks/user/{userId}
   Future<List<TaskDto>> getTasksByUser(int userId) async {
-    final res = await _client.get('api/v1/tasks/user/$userId');
-    final list = jsonDecode(res.body) as List;
-    return list
-        .map((e) => TaskDto.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      print('🌐 TasksApi: GET /api/v1/tasks/user/$userId');
+      final res = await _client.get('api/v1/tasks/user/$userId');
+      print('✅ TasksApi: Response status ${res.statusCode}');
+      print('📋 TasksApi: Response body: ${res.body}');
+      
+      final list = jsonDecode(res.body) as List;
+      print('📊 TasksApi: Parseando ${list.length} tareas del JSON');
+      
+      final tasks = list
+          .map((e) => TaskDto.fromJson(e as Map<String, dynamic>))
+          .toList();
+      
+      print('✅ TasksApi: ${tasks.length} tareas convertidas exitosamente');
+      return tasks;
+    } catch (e, stackTrace) {
+      print('❌ TasksApi Error en getTasksByUser($userId): $e');
+      print('❌ Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   /// GET /api/v1/tasks/project/{projectId}

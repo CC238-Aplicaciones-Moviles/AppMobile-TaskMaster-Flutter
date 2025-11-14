@@ -38,9 +38,19 @@ class ApiClient {
 
   void _throwIfError(http.Response res) {
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      throw Exception(
-        'HTTP ${res.statusCode}: ${res.body}',
-      );
+      String errorMessage = 'HTTP ${res.statusCode}';
+      try {
+        final json = jsonDecode(res.body);
+        if (json is Map && json.containsKey('message')) {
+          errorMessage += ': ${json['message']}';
+        } else {
+          errorMessage += ': ${res.body}';
+        }
+      } catch (_) {
+        errorMessage += ': ${res.body}';
+      }
+      print('❌ ApiClient Error: $errorMessage');
+      throw Exception(errorMessage);
     }
   }
 
