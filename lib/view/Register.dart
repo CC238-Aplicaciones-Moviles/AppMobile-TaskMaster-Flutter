@@ -37,6 +37,19 @@ class _RegisterState extends State<Register> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final username = _usernameController.text.trim();
+    final parts = username
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
+    String name;
+    String lastName;
+    if (parts.length == 1) {
+      name = parts[0];
+      lastName = parts[0];
+    } else {
+      name = parts.first;
+      lastName = parts.sublist(1).join(' ');
+    }
 
     if (email.isEmpty || password.isEmpty || username.isEmpty) {
       setState(() => _error = 'Completa correo, contraseña y username');
@@ -49,13 +62,12 @@ class _RegisterState extends State<Register> {
     });
 
     try {
-      // aquí uso username como name, lastName vacío y rol USER
       final req = SignUpRequest(
-        name: username,
-        lastName: '',
+        name: name,
+        lastName: lastName,
         email: email,
         password: password,
-        roles: const ['USER'],
+        roles: const ['ROLE_MEMBER'],
       );
 
       await _authApi.signUp(req);
@@ -200,14 +212,12 @@ class _RegisterState extends State<Register> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Fondo rojo completo
         Container(color: colorScheme.primary),
 
-        // Triángulo blanco que entra desde abajo
         Align(
           alignment: Alignment.bottomCenter,
           child: SizedBox(
-            height: 120, // ajusta profundidad del pico si quieres
+            height: 120,
             width: double.infinity,
             child: ClipPath(
               clipper: BottomWhiteTriangleClipper(),
@@ -216,7 +226,6 @@ class _RegisterState extends State<Register> {
           ),
         ),
 
-        // Logo + texto
         Column(
           children: [
             const SizedBox(height: 24),
@@ -266,7 +275,6 @@ class _RegisterState extends State<Register> {
             ),
           ),
 
-          // Logo + texto
           Column(
             children: [
               const SizedBox(height: 16),
