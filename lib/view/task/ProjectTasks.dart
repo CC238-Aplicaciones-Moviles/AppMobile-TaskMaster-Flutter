@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/Tasks/TasksBloc.dart';
 import '../../models/projects/ProjectDto.dart';
 import '../../sharedPreferences/TaskmasterPrefs.dart';
+import '../project/ProjectStatistics.dart';
 import 'TasksKanbanView.dart';
 
 class ProjectTasks extends StatefulWidget {
@@ -88,59 +89,60 @@ class _ProjectTasksState extends State<ProjectTasks> {
 
             const SizedBox(height: 20),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 45,
-                      child: TextField(
-                        onChanged: (value) => setState(() => query = value),
-                        decoration: InputDecoration(
-                          hintText: "Buscar tareas",
-                          hintStyle: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                          filled: true,
-                          fillColor: colorScheme.secondaryContainer,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 8),
-                          suffixIcon: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Image.asset(
-                              'assets/img/ic_search.png',
-                              width: 20,
-                              height: 20,
-                              color: colorScheme.onSurface,
+            if (_selectedTabIndex == 0)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 45,
+                        child: TextField(
+                          onChanged: (value) => setState(() => query = value),
+                          decoration: InputDecoration(
+                            hintText: "Buscar tareas",
+                            hintStyle: textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurface.withOpacity(0.6),
+                            ),
+                            filled: true,
+                            fillColor: colorScheme.secondaryContainer,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 8),
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Image.asset(
+                                'assets/img/ic_search.png',
+                                width: 20,
+                                height: 20,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide.none,
                             ),
                           ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide.none,
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurface,
                           ),
-                        ),
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurface,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  IconButton(
-                    icon: Image.asset(
-                      'assets/img/ic_filter.png',
-                      width: 24,
-                      height: 24,
-                      color: colorScheme.onSurface,
+                    const SizedBox(width: 12),
+                    IconButton(
+                      icon: Image.asset(
+                        'assets/img/ic_filter.png',
+                        width: 24,
+                        height: 24,
+                        color: colorScheme.onSurface,
+                      ),
+                      onPressed: () {
+                        // Lógica del filtro
+                      },
                     ),
-                    onPressed: () {
-                      // Lógica del filtro
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
             const SizedBox(height: 20),
 
@@ -163,6 +165,9 @@ class _ProjectTasksState extends State<ProjectTasks> {
                     }
 
                     if (tasksState is TasksLoadSuccess) {
+                      if (_selectedTabIndex == 1) {
+                        return ProjectStatistics(tasks: tasksState.tasks);
+                      }
                       return TasksKanbanView(
                         tasks: tasksState.tasks,
                         searchQuery: query,

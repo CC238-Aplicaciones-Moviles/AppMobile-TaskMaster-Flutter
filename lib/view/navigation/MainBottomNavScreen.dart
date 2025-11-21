@@ -28,7 +28,7 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
       const Project(),
       const Task(),
       const Calendar(),
-      const Notifications(),
+      Notifications(prefs: widget.prefs),
       Profile(prefs: widget.prefs),
     ];
   }
