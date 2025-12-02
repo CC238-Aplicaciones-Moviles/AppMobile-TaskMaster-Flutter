@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskmaster_flutter/bloc/Projects/ProjectsBloc.dart';
 import 'package:taskmaster_flutter/bloc/users/UsersBloc.dart';
 import 'package:taskmaster_flutter/bloc/Calendar/CalendarBloc.dart';
+import 'package:taskmaster_flutter/bloc/Notifications/NotificationsBloc.dart';
 import 'package:taskmaster_flutter/sharedPreferences/TaskmasterPrefs.dart';
 import 'package:taskmaster_flutter/view/Login.dart';
 import 'package:taskmaster_flutter/view/Register.dart';
 import 'package:taskmaster_flutter/view/navigation/MainBottomNavScreen.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:taskmaster_flutter/view/notification/Notifications.dart';
 
 import 'AppTheme.dart';
 
@@ -45,6 +47,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<CalendarBloc>(
           create: (context) => CalendarBloc(),
         ),
+        BlocProvider<NotificationsBloc>(
+          create: (_) => NotificationsBloc(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -55,6 +60,7 @@ class MyApp extends StatelessWidget {
           '/login': (_) => Login(prefs: effectivePrefs),
           '/register': (_) => Register(prefs: effectivePrefs),
           '/home': (_) => MainBottomNavScreen(prefs: effectivePrefs),
+          '/notifications': (_) => const Notifications(),
         },
       ),
     );
