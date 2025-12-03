@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:taskmaster_flutter/core/api_client.dart';
 
-import '../../models/notificattions/NotificationDto.dart';
+import '../../models/notifications/NotificationDto.dart';
 
 
 class NotificationsApi {
