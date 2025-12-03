@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/Tasks/TasksBloc.dart';
 import '../../models/projects/ProjectDto.dart';
+import '../../models/tasks/TaskDto.dart';
 import '../../sharedPreferences/TaskmasterPrefs.dart';
 import '../project/ProjectStatistics.dart';
 import 'TasksKanbanView.dart';
+import 'FiltersDialog.dart';
 
 class ProjectTasks extends StatefulWidget {
   final ProjectDto project;
 
   const ProjectTasks({
-    Key? key,
+    super.key,
     required this.project,
-  }) : super(key: key);
+  });
 
   @override
   State<ProjectTasks> createState() => _ProjectTasksState();
@@ -22,6 +24,11 @@ class _ProjectTasksState extends State<ProjectTasks> {
   String query = "";
   int? _userId;
   int _selectedTabIndex = 0;
+
+  String? _activePriority;
+  String? _activeStatus;
+  DateTime? _activeStartDate;
+  DateTime? _activeEndDate;
 
   @override
   void initState() {
@@ -45,10 +52,141 @@ class _ProjectTasksState extends State<ProjectTasks> {
             userId: userId,
           ),
         );
+      } else {
+        context.read<TasksBloc>().add(
+          TasksFetchByProjectRequested(widget.project.id),
+        );
       }
     } catch (e) {
       print('Error cargando userId: $e');
     }
+  }
+
+  Future<void> _showFiltersDialog() async {
+    final result = await FiltersDialog.show(
+      context,
+      initialPriority: _activePriority,
+      initialStatus: _activeStatus,
+      initialStart: _activeStartDate,
+      initialEnd: _activeEndDate,
+    );
+
+    if (result == null) return;
+
+    if (result.cleared) {
+      _clearFilters();
+      return;
+    }
+
+    _applyFilters(
+      priority: result.priority,
+      status: result.status,
+      start: result.start,
+      end: result.end,
+    );
+  }
+
+  void _clearFilters() {
+    setState(() {
+      _activePriority = null;
+      _activeStatus = null;
+      _activeStartDate = null;
+      _activeEndDate = null;
+    });
+
+    if (_userId != null) {
+      context.read<TasksBloc>().add(
+        TasksFetchByProjectAndUserRequested(
+          projectId: widget.project.id,
+          userId: _userId!,
+        ),
+      );
+    } else {
+      context.read<TasksBloc>().add(
+        TasksFetchByProjectRequested(widget.project.id),
+      );
+    }
+  }
+
+  void _applyFilters({
+    String? priority,
+    String? status,
+    DateTime? start,
+    DateTime? end,
+  }) {
+    setState(() {
+      _activePriority = priority;
+      _activeStatus = status;
+      _activeStartDate = start;
+      _activeEndDate = end;
+    });
+
+    if (_userId != null) {
+      context.read<TasksBloc>().add(
+        TasksFetchByProjectAndUserRequested(
+          projectId: widget.project.id,
+          userId: _userId!,
+        ),
+      );
+      return;
+    }
+
+    if (priority != null && status == null) {
+      context.read<TasksBloc>().add(
+        TasksFetchByProjectAndPriorityRequested(
+          projectId: widget.project.id,
+          priority: priority,
+        ),
+      );
+    } else if (status != null && priority == null) {
+      context.read<TasksBloc>().add(
+        TasksFetchByProjectAndStatusRequested(
+          projectId: widget.project.id,
+          status: status,
+        ),
+      );
+    } else if (priority != null && status != null) {
+      context.read<TasksBloc>().add(
+        TasksFetchByProjectAndPriorityRequested(
+          projectId: widget.project.id,
+          priority: priority,
+        ),
+      );
+    } else {
+      context.read<TasksBloc>().add(
+        TasksFetchByProjectRequested(widget.project.id),
+      );
+    }
+  }
+
+  List<TaskDto> _applyLocalFilters(List<TaskDto> tasks) {
+    var filtered = tasks;
+
+    if (_activePriority != null) {
+      filtered = filtered.where((t) => t.priority.name == _activePriority).toList();
+    }
+
+    if (_activeStatus != null) {
+      filtered = filtered.where((t) => t.status.name == _activeStatus).toList();
+    }
+
+    if (_activeStartDate != null) {
+      filtered = filtered.where((t) {
+        final sd = DateTime.tryParse(t.startDate);
+        if (sd == null) return false;
+        return !sd.isBefore(_activeStartDate!);
+      }).toList();
+    }
+
+    if (_activeEndDate != null) {
+      filtered = filtered.where((t) {
+        final ed = DateTime.tryParse(t.endDate);
+        if (ed == null) return false;
+        return !ed.isAfter(_activeEndDate!);
+      }).toList();
+    }
+
+    return filtered;
   }
 
   @override
@@ -71,12 +209,10 @@ class _ProjectTasksState extends State<ProjectTasks> {
                 textAlign: TextAlign.center,
               ),
             ),
-
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
                 color: colorScheme.secondaryContainer,
-                borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
@@ -86,9 +222,7 @@ class _ProjectTasksState extends State<ProjectTasks> {
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
-
             if (_selectedTabIndex == 0)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -136,16 +270,12 @@ class _ProjectTasksState extends State<ProjectTasks> {
                         height: 24,
                         color: colorScheme.onSurface,
                       ),
-                      onPressed: () {
-                        // Lógica del filtro
-                      },
+                      onPressed: _showFiltersDialog,
                     ),
                   ],
                 ),
               ),
-
             const SizedBox(height: 20),
-
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -165,11 +295,18 @@ class _ProjectTasksState extends State<ProjectTasks> {
                     }
 
                     if (tasksState is TasksLoadSuccess) {
+                      final filteredTasks = _applyLocalFilters(tasksState.tasks);
+
                       if (_selectedTabIndex == 1) {
-                        return ProjectStatistics(tasks: tasksState.tasks);
+                        return ProjectStatistics(tasks: filteredTasks);
                       }
                       return TasksKanbanView(
-                        tasks: tasksState.tasks,
+                        tasks: filteredTasks.where((task) {
+                          if (query.isEmpty) return true;
+                          final q = query.toLowerCase();
+                          return task.title.toLowerCase().contains(q) ||
+                              task.description.toLowerCase().contains(q);
+                        }).toList(),
                         searchQuery: query,
                       );
                     }
