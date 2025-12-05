@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "915309882566",
+    "project_id": "taskmaster-flutter",
+    "storage_bucket": "taskmaster-flutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915309882566:android:dc4beb649c227ee2b3fbc7",
+        "android_client_info": {
+          "package_name": "com.example.taskmaster_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4WlbPUN1OUyKC7QPItAOf8L0Eb3qKLRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
