@@ -199,10 +199,11 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
         );
         final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
 
-        // Solo coincide si es la fecha de inicio O la fecha de fin
-        final matches =
-            dateOnly.isAtSameMomentAs(startDateOnly) ||
-            dateOnly.isAtSameMomentAs(endDateOnly);
+        // Coincide si la fecha está dentro del rango de la tarea (inclusive)
+        final matches = (dateOnly.isAtSameMomentAs(startDateOnly) ||
+                dateOnly.isAfter(startDateOnly)) &&
+            (dateOnly.isAtSameMomentAs(endDateOnly) ||
+                dateOnly.isBefore(endDateOnly));
 
         if (matches) {
           print(
