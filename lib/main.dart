@@ -12,6 +12,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'AppTheme.dart';
 
 import 'bloc/Tasks/TasksBloc.dart';
+import 'bloc/notifications/NotificationBloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +45,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<CalendarBloc>(
           create: (context) => CalendarBloc(),
+        ),
+        BlocProvider<NotificationBloc>(
+          create: (context) => NotificationBloc(),
         ),
       ],
       child: MaterialApp(

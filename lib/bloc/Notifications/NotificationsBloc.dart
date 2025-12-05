@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 
-import '../../models/notificattions/NotificationDto.dart';
+import '../../models/notifications/NotificationDto.dart';
 import '../../repository/NotificationsRepository.dart';
 
 

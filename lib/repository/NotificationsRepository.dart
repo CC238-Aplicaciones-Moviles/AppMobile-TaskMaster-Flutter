@@ -1,6 +1,6 @@
 
 import '../core/notifications/NotificationsApi.dart';
-import '../models/notificattions/NotificationDto.dart';
+import '../models/notifications/NotificationDto.dart';
 
 class NotificationsRepository {
   final NotificationsApi _api;
