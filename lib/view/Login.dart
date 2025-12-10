@@ -6,6 +6,7 @@ import 'package:jwt_decode/jwt_decode.dart';
 import '../core/auth/AuthApi.dart';
 import '../core/auth/TokenStore.dart';
 import '../core/users/UsersApi.dart';
+import '../core/webhook/WebhookService.dart';
 
 class Login extends StatefulWidget {
   final TaskmasterPrefs prefs;
@@ -73,6 +74,12 @@ class _LoginState extends State<Login> {
       }
 
       await TokenStore.saveToken(token);
+
+      // Notify n8n webhook about user login
+      print('🔔 Calling n8n webhook for login...');
+      await WebhookService.notifyUserLogin(
+        email: email,
+      );
 
       if (!mounted) return;
 

@@ -4,6 +4,7 @@ import 'package:taskmaster_flutter/models/auth/SignUpRequest.dart';
 import 'package:taskmaster_flutter/sharedPreferences/TaskmasterPrefs.dart';
 
 import '../core/auth/AuthApi.dart';
+import '../core/webhook/WebhookService.dart';
 
 class Register extends StatefulWidget {
   final TaskmasterPrefs prefs;
@@ -73,6 +74,14 @@ class _RegisterState extends State<Register> {
       await _authApi.signUp(req);
 
       await _prefs.saveEmailAndPassword(email: email, password: password);
+
+      // Notify n8n webhook about new user registration
+      print('🔔 Calling n8n webhook...');
+      await WebhookService.notifyUserRegistration(
+        name: name,
+        lastName: lastName,
+        email: email,
+      );
 
       if (!mounted) return;
       Navigator.pop(context);
